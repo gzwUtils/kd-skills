@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -lah /Users/gaozhiwei/Desktop/项目/kd-skills/*/SKILL.md)",
+      "Read(//Users/gaozhiwei/Desktop/项目/kd-skills/**)",
+      "Bash(xargs -I {} basename {})",
+      "Bash(git init:*)",
+      "Bash(mkdir -p skills agents)",
+      "Bash(mv api-designer:*)",
+      "Bash(mv integrations/intellij-plugin agents/)",
+      "Bash(rmdir integrations:*)"
+    ]
+  }
+}
