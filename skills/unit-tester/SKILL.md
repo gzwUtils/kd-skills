@@ -3,32 +3,84 @@ name: "unit-tester"
 description: "提供 Java Spring Boot 应用的单元测试最佳实践和策略。在编写测试或提升测试覆盖率时调用。"
 ---
 
-# 单元测试专家（Testing Pyramid）
+# 单元测试专家
 
-目标：用最小成本获得最大信心。优先覆盖 **核心业务规则** 与 **关键集成点**，避免“为覆盖率而测试”。
+本技能为 Java Spring Boot 应用提供全面的单元测试策略和最佳实践，确保代码质量和可靠性。
 
-## 适用范围
-- Java 17 + Spring Boot 3.x
-- JUnit 5 / Mockito / AssertJ / Spring Test / Testcontainers
+## 核心功能
 
-## 测试分层（建议）
-- **Unit**（最多）：纯业务逻辑、无 Spring 容器、无 IO（快、稳定）
-- **Integration**：DB/Redis/MQ/第三方依赖（用 Testcontainers）
-- **E2E**（最少）：关键链路冒烟，防止配置/部署问题
+### 测试框架
+- **JUnit 5**：Java 现代测试框架
+- **Mockito**：依赖模拟框架
+- **AssertJ**：流式断言库
+- **Spring Test**：Spring 专用测试工具
+- **TestContainers**：基于真实依赖的集成测试
 
-## 编写策略（高收益）
-- 先写 **核心规则**：状态机、金额计算、权限判定、幂等/去重
-- 失败路径必测：异常、超时、边界输入、并发冲突
-- Mock 要克制：只 Mock 外部依赖；不要 Mock 被测对象内部细节
-- 测试数据要可读：用 Builder/Fixture，避免一堆魔法数字
+### 测试类型
+- **单元测试**：测试单个组件
+- **集成测试**：测试组件间交互
+- **端到端测试**：测试完整工作流
+- **性能测试**：测试系统性能
+- **安全测试**：测试安全相关方面
 
-## 可维护性约束
-- 一个测试只验证一个行为（Arrange/Act/Assert）
-- 命名表达意图：`should_xxx_when_yyy`
-- 避免脆弱断言：不要断言无关字段/顺序（除非契约要求）
+### 测试策略
+- **模拟（Mocking）**：正确使用模拟对象和存根
+- **测试替身（Test Doubles）**：伪对象、存根、模拟对象、间谍对象
+- **测试夹具（Test Fixtures）**：初始化和清理流程
+- **参数化测试**：使用多组输入进行测试
+- **测试覆盖率**：度量和提升覆盖率
+
+### 虚拟电厂专项测试
+- **设备管理测试**：测试设备的增删改查操作
+- **能源交易测试**：测试交易处理流程
+- **监控测试**：测试实时数据处理
+- **用户管理测试**：测试认证与授权
+
+## 实现示例
+
+```java
+@SpringBootTest
+@AutoConfigureMockMvc
+public class DeviceControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private DeviceService deviceService;
+
+    @Test
+    public void testGetDevice() throws Exception {
+        Device device = new Device();
+        device.setId(1L);
+        device.setName("Test Device");
+
+        when(deviceService.getDevice(1L)).thenReturn(device);
+
+        mockMvc.perform(get("/v1/devices/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(jsonPath("$.name").value("Test Device"));
+    }
+}
+```
+
+## 最佳实践
+
+- **测试隔离**：测试之间应相互独立
+- **测试命名**：使用清晰、具有描述性的测试名称
+- **测试覆盖率**：追求高测试覆盖率
+- **测试维护**：保持测试的可维护性
+- **CI/CD 集成**：在 CI/CD 流水线中运行测试
+- **测试数据**：使用合适的测试数据
 
 ## 检查清单
-- [ ] 核心业务规则有单测覆盖（含失败路径）
-- [ ] 关键集成点有集成测试（优先 Testcontainers）
-- [ ] CI 执行稳定，测试时间可控
-- [ ] Mock 使用合理，不与实现细节强耦合
+
+- [ ] 所有业务逻辑均有单元测试
+- [ ] 组件交互均有集成测试
+- [ ] 关键工作流均有端到端测试
+- [ ] 合理使用模拟对象
+- [ ] 测试覆盖率已度量并持续提升
+- [ ] 测试已集成到 CI/CD 流水线
+- [ ] 已制定测试数据管理策略
+- [ ] 已制定测试维护计划

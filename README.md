@@ -1,47 +1,130 @@
-# kd-skills：Java 架构师 & AI 程序员 Skill 仓库
+# AI Skill 知识库
 
-这是一套面向 **Java 17 + Spring Boot 3.x** 团队的可复用 Skill（提示词/流程/清单），用于：
-
-- 让 AI 在 **设计 API、生成代码、审查代码、异常处理、单测、安全、性能、Git 流程、文档** 等场景更稳定地产出
-- 将团队规范沉淀成可执行的“检查清单 + 工作流”
-- 支撑 IDE/CI 的自动化（见 `integrations/`）
+> 将专业知识、工作流规范固化为可复用的 `SKILL.md`，让 AI 编程助手按固定流程执行任务。
 
 ## 目录结构
 
-- `*/SKILL.md`：一个 Skill（可直接迁移到你的 Skill 系统/工具中）
-- `common/`：通用提示或素材（可选）
-- `integrations/intellij-plugin/`：IntelliJ IDEA 提交前检查插件（Commit-time AI Review）
+```
+kd-skills/
+├── skills/                    # 所有技能（统一 目录/SKILL.md 结构）
+│   ├── api-designer/          # RESTful API 设计规范
+│   ├── bug-analyzer/          # 执行流分析 & 根因定位
+│   ├── code-generator/        # CRUD 代码生成器
+│   ├── code-reviewer/         # 深度代码审查
+│   ├── dev-planner/           # 需求拆解 & 开发计划
+│   ├── documentation/         # 项目文档规范
+│   ├── git规范/               # Git 工作流与提交规范
+│   ├── story-generator/       # 用户故事 & AC 生成
+│   ├── ui-sketcher/           # ASCII UI 原型设计
+│   ├── unit-tester/           # 单元测试规范
+│   ├── claude-api/            # Claude API 使用指南
+│   ├── pdf/                   # PDF 处理
+│   ├── pptx/                  # PPT 制作
+│   ├── docx/                  # Word 文档处理
+│   ├── xlsx/                  # Excel 表格处理
+│   ├── frontend-design/       # 前端 UI 设计
+│   ├── canvas-design/         # Canvas 画布设计
+│   ├── mcp-builder/           # MCP 服务器构建
+│   ├── skill-creator/         # 技能创建工具
+│   ├── theme-factory/         # 主题样式工厂
+│   ├── web-artifacts-builder/ # Web 组件构建
+│   ├── webapp-testing/        # Web 应用测试
+│   ├── doc-coauthoring/       # 文档协作
+│   ├── algorithmic-art/       # 算法艺术生成
+│   ├── brand-guidelines/      # 品牌规范
+│   ├── internal-comms/        # 内部沟通
+│   └── slack-gif-creator/     # Slack GIF 制作
+├── commands/                  # 斜杠命令（用户 /命令 调用）
+│   ├── commit/                # /commit — Java/Maven 提交助手
+│   ├── review/                # /review — 代码变更审查
+│   └── patrol/                # /patrol — 项目健康巡检
+├── docs/                      # 文档
+│   └── 提效手册.md             # 落地路径与提效策略
+├── Skills教程.md              # Skills 详细教程
+└── Agent Skills原理.md        # 原理说明
+```
 
-## 现有 Skills
+## 安装使用
 
-| Skill | 说明 |
-|---|---|
-| `api-designer` | RESTful API 设计最佳实践 |
-| `architecture-reviewer` | 架构边界/一致性/演进成本评审 |
-| `ci-cd-engineer` | CI/CD 流水线与质量门禁 |
-| `code-generator` | CRUD/基础架构生成指引 |
-| `code-reviewer` | PR/提交代码审查要点与清单 |
-| `database-designer` | MySQL 表设计与 SQL 评审清单 |
-| `documentation` | 文档体系与维护流程 |
-| `exception-handler` | 统一异常处理与错误码规范 |
-| `git规范` | 分支策略、提交信息与协作流程 |
-| `observability-engineer` | 日志/指标/链路追踪与告警实践 |
-| `performance-optimizer` | 性能定位与优化策略 |
-| `security-expert` | Spring 安全、输入校验与常见漏洞防护 |
-| `unit-tester` | 单测/集成测策略与示例 |
+### 一键安装
 
-## IntelliJ 提交前检查（Agent）
+```bash
+cp -r skills/* ~/.claude/skills/
+cp -r commands/* ~/.claude/commands/
+```
 
-插件代码在 `integrations/intellij-plugin/`，通过 VCS 提交前钩子读取你本地的 `SKILL.md`，把 **本次变更** 发给 OpenAI-Compatible LLM 做规范检查，并在提交前给出 PASS/BLOCK 建议。
+### 按需安装
 
-配置方式（插件内 Settings）：
+```bash
+# Java 开发相关
+cp -r skills/code-generator skills/api-designer skills/bug-analyzer ~/.claude/skills/
+cp -r commands/* ~/.claude/commands/
+```
 
-1. `Skills root path` 指向本仓库根目录（或你发布到 GitHub 后 clone 的目录）
-2. `Skill names` 为空表示全量；也可填写 `code-reviewer,security-expert,...`
-3. 配置 `base URL / API key / model`
+### 安装到项目目录（仅当前项目生效）
 
-> 默认使用 OpenAI ChatCompletions 兼容接口（例如 OpenAI、Azure OpenAI、或本地网关/兼容服务）。
+```bash
+mkdir -p .claude/skills .claude/commands
+cp -r skills/code-generator .claude/skills/
+cp -r skills/code-reviewer .claude/skills/
+```
 
-## 提效手册
+## 斜杠命令
 
-见 `docs/提效手册.md`。
+| 命令 | 说明 | 用法 |
+|------|------|------|
+| `/commit` | 分析 git diff，生成中文 Conventional Commits 提交 | `/commit`、`/commit --type=feat --scope=auth` |
+| `/review` | 对代码变更执行多维度审查（NPE/注入/N+1等） | `/review --staged`、`/review --branch=main` |
+| `/patrol` | 扫描项目代码健康（TODO/大类/测试覆盖等） | `/patrol`、`/patrol src/main/java` |
+
+## Skills 一览
+
+### Java 开发
+
+| 技能 | 说明 |
+|------|------|
+| **code-generator** | CRUD 代码生成（Entity/DTO/Mapper/Service/Controller） |
+| **api-designer** | RESTful API 设计规范 |
+| **code-reviewer** | 深度代码审查，安全扫描，性能分析 |
+| **bug-analyzer** | 执行流分析，追踪变量状态，根因定位 |
+| **dev-planner** | 需求拆解、任务分解、依赖分析、工期估算 |
+| **story-generator** | 从 diff/PRD/对话中提取用户故事和验收标准 |
+| **ui-sketcher** | ASCII UI 原型设计，交互流程规划 |
+| **unit-tester** | 单元测试规范（JUnit 5 + Mockito） |
+| **documentation** | 项目文档管理 |
+| **git规范** | Git 工作流与提交规范 |
+
+### 通用工具
+
+| 技能 | 说明 |
+|------|------|
+| **pdf** | PDF 读取、提取、合并、拆分 |
+| **pptx** | PPT 演示文稿制作 |
+| **docx** | Word 文档处理 |
+| **xlsx** | Excel 表格处理 |
+| **claude-api** | Claude API/SDK 开发指南 |
+| **mcp-builder** | MCP 服务器构建 |
+| **skill-creator** | 技能创建工具 |
+| **frontend-design** | 前端 UI 设计 |
+| **canvas-design** | Canvas 画布设计 |
+| **theme-factory** | 主题样式工厂 |
+| **web-artifacts-builder** | Web 组件构建 |
+| **webapp-testing** | Web 应用测试 |
+| **doc-coauthoring** | 文档协作 |
+| **algorithmic-art** | 算法艺术生成 |
+| **brand-guidelines** | 品牌规范 |
+| **internal-comms** | 内部沟通 |
+| **slack-gif-creator** | Slack GIF 制作 |
+
+## 相关资源
+
+- [Skills教程.md](./Skills教程.md) — 详细教程
+- [Agent Skills原理.md](./Agent%20Skills原理.md) — 原理说明
+- [提效手册](./docs/提效手册.md) — Java 架构师 & AI 程序员提效落地指南
+
+| 资源 | 链接 |
+|------|------|
+| Agent Skills 官方标准 | https://agentskills.io |
+| Anthropic 官方 Skills 仓库 | https://github.com/anthropics/skills |
+| Skills 市场（中文） | https://skillsmp.com/zh |
+| Skill 聚合入口 | https://skills.sh/ |

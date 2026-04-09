@@ -3,55 +3,67 @@ name: "api-designer"
 description: "遵循最佳实践和标准设计 RESTful API。在创建新 API 或审查现有 API 设计时调用。"
 ---
 
-# API 设计器（REST / Spring Boot）
+# API 设计器
 
-用于设计/评审 **可演进、可观测、可治理** 的 HTTP API（面向 Java 17 + Spring Boot 3.x）。
+该技能帮助遵循行业最佳实践和标准，为 Java Spring Boot 应用程序设计 RESTful API。
 
-## 适用范围
-- REST/JSON API（BFF 或业务服务）
-- Spring MVC/WebFlux（按项目选择）
+## 核心功能
 
-## 工作流（建议）
-1. **定义资源与边界**：资源是什么？归属哪个领域/模块？是否需要拆分子资源？
-2. **定义契约**：URL、方法、入参、返回、错误模型、幂等/并发语义。
-3. **补齐横切能力**：鉴权、审计、限流、分页、排序、过滤、兼容性策略。
-4. **写清楚文档**：OpenAPI + 示例（成功/失败/边界条件）。
-5. **可回归**：最小契约测试/示例调用（Postman/HTTP 文件/集成测试）。
+### RESTful API 设计原则
+- **资源命名**：使用名词作为资源名称（例如 `/users`、`/devices`）
+- **HTTP 方法**：正确使用 GET、POST
+- **状态码**：针对不同场景使用恰当的 HTTP 状态码
+- **请求/响应格式**：统一的 JSON 结构
+- **版本控制**：API 版本管理策略（例如 `/v3/users`）
 
-## 设计规范（关键点）
+### Spring Boot 实现
+- **控制器结构**：使用适当注解的有组织的控制器类
+- **请求校验**：使用 `@Valid` 和自定义校验器
+- **异常处理**：全局异常处理器，确保一致的错误响应
+- **文档生成**：集成 Springdoc OpenAPI
 
-### 资源命名
-- 使用 **名词** 作为资源：`/users`、`/devices`、`/orders`
-- 子资源/关系：`/users/{id}/roles`、`/orders/{id}/items`
-- 避免动词 URL：优先用方法语义表达（必要时用动作资源：`/orders/{id}:cancel`）
+### 最佳实践
+- **分页**：适用于大数据量集合
+- **过滤**：使用查询参数过滤资源
+- **排序**：支持结果排序
+- **安全性**：适当的认证与授权机制
+- **限流**：防止 API 滥用
 
-### 方法与状态码
-- GET 查询、POST 创建、PUT/DELETE 幂等更新/删除、PATCH 局部更新（需定义字段语义）
-- 状态码与错误码 **分工明确**：HTTP 表达通用语义；业务错误靠统一错误码
+## 使用示例
 
-### 请求/响应模型
-- DTO 设计围绕 **客户端视角**：避免直接暴露实体/表结构
-- 对外字段要稳定：新增字段向前兼容；删除/改语义要走版本/灰度策略
-- 统一错误响应：`code/message/traceId/details`（示例见异常处理 Skill）
+```java
+// 符合 RESTful 设计的控制器示例
+@RestController
+@RequestMapping("/v1/devices")
+public class DeviceController {
 
-### 分页/过滤/排序
-- 分页参数统一：`page/size` 或 `cursor/limit`（深分页建议 cursor）
-- 过滤与排序使用白名单字段，避免任意 SQL 拼接
+    @GetMapping
+    public ResponseEntity<List<Device>> getDevices(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        // 具体实现
+    }
 
-### 安全与治理
-- 鉴权：统一认证方式（JWT/OAuth2），权限模型清晰（RBAC/ABAC）
-- 幂等：创建/扣减类接口明确幂等键（header 或业务字段）与去重策略
-- 限流与超时：关键接口按租户/用户/设备等维度限流；外部依赖超时/重试策略明确
+    @PostMapping
+    public ResponseEntity<Device> createDevice(@Valid @RequestBody Device device) {
+        // 具体实现
+    }
+}
+```
 
-## 可自动化检查（建议接入）
-- OpenAPI 规范检查（lint）
-- 契约测试（Spring Cloud Contract 或自建）
-- 安全扫描（鉴权缺失、CORS/CSRF 配置等）
+## 虚拟电厂平台集成
+
+- **设备管理 API**：用于管理智能设备
+- **能源交易 API**：用于能源交易处理
+- **监控 API**：用于实时数据监控
+- **用户管理 API**：用于平台用户管理
 
 ## 检查清单
-- [ ] 资源与边界清晰，URL 命名合理
-- [ ] 方法/状态码/错误码语义一致
-- [ ] 请求/响应 DTO 不泄露内部模型
-- [ ] 分页/过滤/排序策略统一且可控
-- [ ] 鉴权/审计/限流/幂等策略明确
-- [ ] OpenAPI 文档与示例齐全
+
+- [ ] API 遵循 RESTful 原则
+- [ ] 使用正确的 HTTP 方法和状态码
+- [ ] 请求/响应格式一致
+- [ ] 输入校验
+- [ ] 异常处理
+- [ ] 接口文档
+- [ ] 安全性考量
